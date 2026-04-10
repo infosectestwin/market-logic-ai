@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import pandas as pd
+import altair as alt
 
 # Page Config
 st.set_page_config(
@@ -89,13 +90,23 @@ if data:
         df_chart = pd.DataFrame(history)
         
         # Format the date and set as index
-        df_chart['date'] = pd.to_datetime(df_chart['date'])
-        df_chart = df_chart.set_index('date')
-        
+        df_chart['date'] = pd.to_datetime(df_chart['date'])        
+        chart_data = df_chart.melt('date', var_name='Metric', value_name='Value')
+
         # Use the standardized names from API
-        st.line_chart(df_chart[['price', 'sma']], y="price")
+        line_chart = alt.Chart(chart_data).mark_line().encode(
+        x=alt.X('date:T', title='Date'),
+        y=alt.Y('Value:Q', 
+                scale=alt.Scale(zero=False), # This removes the 0-5000 gap!
+                title='Price (USD)'),
+        color=alt.Color('Metric:N', scale=alt.Scale(range=['#1f77b4', '#ff7f0e'])) # Blue for Price, Orange for SMA
+    ).properties(
+        height=400
+    ).interactive() # Allows zooming and panning!
+
+    st.altair_chart(line_chart, use_container_width=True)
         
-        st.caption("Visualization of the last 60 trading days used to generate the current signal.")
+    st.caption("Visualization of the last 60 trading days used to generate the current signal.")
 
     # --- ROW 2: SYSTEM ARCHITECTURE ---
     st.divider()
