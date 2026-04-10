@@ -10,7 +10,7 @@ st.set_page_config(
 )
 
 # Title and Branding
-st.title("📈 S&P 500 Intelligence Pipeline")
+st.title("📈 Market Logic AI")
 st.markdown("### *Production-Grade Financial Signals via Zerve DAG*")
 st.divider()
 
@@ -80,6 +80,23 @@ if data:
         # Display the clean date without the time
         st.metric(label="Last Data Update", value=clean_date)
 
+    # ---  Historical Chart ---
+    st.markdown("---")
+    st.subheader("📊 S&P 500 Price vs. 20-Day SMA")
+    
+    history = data.get("history", [])
+    if history:
+        df_chart = pd.DataFrame(history)
+        
+        # Format the date and set as index
+        df_chart['date'] = pd.to_datetime(df_chart['date'])
+        df_chart = df_chart.set_index('date')
+        
+        # Use the standardized names from API
+        st.line_chart(df_chart[['price', 'sma']])
+        
+        st.caption("Visualization of the last 60 trading days used to generate the current signal.")
+
     # --- ROW 2: SYSTEM ARCHITECTURE ---
     st.divider()
     st.subheader("System Architecture")
@@ -89,19 +106,36 @@ if data:
     
     # Sidebar for extra "Impressive" links
     with st.sidebar:
-        st.header("Technical Assets")
+        st.header("⚙️ System Status")
         st.link_button("View FastAPI Docs (Swagger)", "https://market-logic-ai.hub.zerve.cloud/docs")
         st.link_button("View Zerve Notebook", "https://www.zerve.ai/gallery/073645cd-9e82-42e6-8985-1a423a66fb79")
         
         st.divider()
     
         # The Live Status Indicator
+        # 1. Market Data (The "Logic" Date)
+        # We strip the 00:00:00 to keep it clean
+        market_date = data.get('market_close_date').split(" ")[0]
+    
+        # 2. API Check (The "System" Time)
+        # This proves the pipeline is currently 'breathing'
+        poll_full = data.get('api_polled_at') 
+        poll_date = poll_full.split(" ")[0]
+        poll_time = poll_full.split(" ")[1]
+        data_count = data.get('data_points_analyzed', '---')
+
         st.markdown("### 🟢 System Status: **Live**")
-        current_time = pd.Timestamp.now().strftime('%I:%M:%S %p')
-        st.caption(f"Last API Sync: {current_time}")
+        st.metric(label="Data Points Analyzed", value=f"{data_count} Days")    
+
+        st.divider()
+        
+        st.write(f"**Data Date:** {market_date}")
+        st.write(f"**Last Sync:** {poll_time}")
+        st.caption(f"Sync Date: {poll_date}")        
         
         st.write("---")
         st.info("This dashboard consumes a live Directed Acyclic Graph (DAG) pipeline built on Zerve.")
+        st.info("Live feed from FRED (Federal Reserve). Updates depend on source publication schedule.")
         st.caption("Developed for the 2026 Zerve Hackathon")
 
 else:
