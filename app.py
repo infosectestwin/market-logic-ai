@@ -82,7 +82,7 @@ if data:
 
     # ---  Historical Chart ---
     st.markdown("---")
-    st.subheader("📊 S&P 500 Price vs. 20-Day SMA")
+    st.subheader("📊 S&P 500 Price vs. 20-Day SMA(60 Trading Days)")
     
     history = data.get("history", [])
     if history:
@@ -106,13 +106,7 @@ if data:
     
     # Sidebar for extra "Impressive" links
     with st.sidebar:
-        st.header("⚙️ System Status")
-        st.link_button("View FastAPI Docs (Swagger)", "https://market-logic-ai.hub.zerve.cloud/docs")
-        st.link_button("View Zerve Notebook", "https://www.zerve.ai/gallery/073645cd-9e82-42e6-8985-1a423a66fb79")
-        
-        st.divider()
-    
-        # The Live Status Indicator
+         # The Live Status Indicator
         # 1. Market Data (The "Logic" Date)
         # We strip the 00:00:00 to keep it clean
         market_date = data.get('market_close_date').split(" ")[0]
@@ -124,14 +118,17 @@ if data:
         poll_time = poll_full.split(" ")[1]
         data_count = data.get('data_points_analyzed', '---')
 
-        st.markdown("### 🟢 System Status: **Live**")
-        st.metric(label="Data Points Analyzed", value=f"{data_count} Days")    
-
-        st.divider()
-        
+        st.header("⚙️ System Status: **Live**")        
+        st.metric(label="Data Points Analyzed", value=f"{data_count} Days")  
         st.write(f"**Data Date:** {market_date}")
         st.write(f"**Last Sync:** {poll_time}")
-        st.caption(f"Sync Date: {poll_date}")        
+        st.caption(f"Sync Date: {poll_date}")  
+
+        st.divider()
+    
+        st.subheader("📚 Project Resources")
+        st.link_button("View FastAPI Docs (Swagger)", "https://market-logic-ai.hub.zerve.cloud/docs")
+        st.link_button("View Zerve Notebook", "https://www.zerve.ai/gallery/073645cd-9e82-42e6-8985-1a423a66fb79")
         
         st.write("---")
         st.info("This dashboard consumes a live Directed Acyclic Graph (DAG) pipeline built on Zerve.")
