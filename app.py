@@ -93,7 +93,7 @@ if data:
         df_chart = df_chart.set_index('date')
         
         # Use the standardized names from API
-        st.line_chart(df_chart[['price', 'sma']])
+        st.line_chart(df_chart[['price', 'sma']], y="price")
         
         st.caption("Visualization of the last 60 trading days used to generate the current signal.")
 
